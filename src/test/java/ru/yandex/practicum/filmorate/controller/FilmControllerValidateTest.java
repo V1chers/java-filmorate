@@ -76,7 +76,7 @@ public class FilmControllerValidateTest {
     }
 
     @Test
-    public void ZeroDurationShouldPass() {
+    public void zeroDurationShouldPass() {
         film.setDuration(0);
         validateException = filmController.validateFilm(film);
 
@@ -84,7 +84,7 @@ public class FilmControllerValidateTest {
     }
 
     @Test
-    public void NegativeDurationShouldNotPass() {
+    public void negativeDurationShouldNotPass() {
         film.setDuration(-1);
         validateException = filmController.validateFilm(film);
 
