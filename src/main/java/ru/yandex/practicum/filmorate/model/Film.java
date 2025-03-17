@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
+import ru.yandex.practicum.filmorate.SerializersAndDeserializers.DurationDeserializer;
+import ru.yandex.practicum.filmorate.SerializersAndDeserializers.DurationSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -15,6 +18,8 @@ public class Film {
     private String name;
     private String description;
     private LocalDate releaseDate;
+    @JsonSerialize(using = DurationSerializer.class)
+    @JsonDeserialize(using = DurationDeserializer.class)
     private Duration duration;
 
     public Film() {
@@ -27,14 +32,5 @@ public class Film {
         this.description = film.getDescription();
         this.releaseDate = film.getReleaseDate();
         this.duration = film.getDuration();
-    }
-
-    @Autowired
-    public void setDuration(int duration) {
-        this.duration = Duration.ofMinutes(duration);
-    }
-
-    public void setDuration(Duration duration) {
-        this.duration = duration;
     }
 }
