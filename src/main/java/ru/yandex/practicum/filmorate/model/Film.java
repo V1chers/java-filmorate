@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.yandex.practicum.filmorate.SerializersAndDeserializers.DurationSerializer;
+import ru.yandex.practicum.filmorate.serializeranddeserializer.DurationSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;

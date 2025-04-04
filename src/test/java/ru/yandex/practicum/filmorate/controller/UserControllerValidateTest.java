@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.Exception.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -80,5 +80,13 @@ public class UserControllerValidateTest {
         validateException = userController.validateUser(user);
 
         assertEquals("email должен содержать символ \"@\"", validateException.getMessage());
+    }
+
+    @Test
+    public void loginShouldNotContainSpace() {
+        user.setLogin("Random User 1000-7");
+        validateException = userController.validateUser(user);
+
+        assertEquals("Логин не может содержать пробелы", validateException.getMessage());
     }
 }

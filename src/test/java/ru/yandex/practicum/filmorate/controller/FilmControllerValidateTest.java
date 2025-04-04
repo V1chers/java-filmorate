@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.Exception.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -76,11 +76,12 @@ public class FilmControllerValidateTest {
     }
 
     @Test
-    public void zeroDurationShouldPass() {
+    public void zeroDurationShouldNotPass() {
         film.setDuration(0);
         validateException = filmController.validateFilm(film);
 
-        assertNull(validateException);
+        assertEquals("Продолжительность фильма не может быть отрицательной или равна нулю",
+                validateException.getMessage());
     }
 
     @Test
@@ -88,6 +89,7 @@ public class FilmControllerValidateTest {
         film.setDuration(-1);
         validateException = filmController.validateFilm(film);
 
-        assertEquals("Продолжительность фильма не может быть отрицательной", validateException.getMessage());
+        assertEquals("Продолжительность фильма не может быть отрицательной или равна нулю",
+                validateException.getMessage());
     }
 }

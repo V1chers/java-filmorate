@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.SerializersAndDeserializers;
+package ru.yandex.practicum.filmorate.serializeranddeserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

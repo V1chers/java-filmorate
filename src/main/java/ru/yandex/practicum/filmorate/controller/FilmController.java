@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.Exception.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.Exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
@@ -99,8 +99,8 @@ public class FilmController {
         if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
             return new ConditionsNotMetException("Дата релиза не может быть раньше дня рождения кино");
         }
-        if (film.getDuration().isNegative()) {
-            return new ConditionsNotMetException("Продолжительность фильма не может быть отрицательной");
+        if (!film.getDuration().isPositive()) {
+            return new ConditionsNotMetException("Продолжительность фильма не может быть отрицательной или равна нулю");
         }
         return null;
     }

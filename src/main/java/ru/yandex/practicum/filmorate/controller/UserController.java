@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.Exception.ConditionsNotMetException;
-import ru.yandex.practicum.filmorate.Exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -100,6 +100,9 @@ public class UserController {
     public ConditionsNotMetException validateUser(User user) {
         if (user.getLogin() == null || user.getLogin().isBlank()) {
             return new ConditionsNotMetException("Логин не может быть пустым");
+        }
+        if (user.getLogin().contains(" ")) {
+            return new ConditionsNotMetException("Логин не может содержать пробелы");
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
             return new ConditionsNotMetException("День рождения не может быть позже текущей даты");
