@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.storage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,28 +6,29 @@ import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class UserControllerValidateTest {
+public class InMemoryUserStorageValidateTest {
     User user;
-    UserController userController;
+    InMemoryUserStorage inMemoryUserStorage;
     ConditionsNotMetException validateException;
 
     @BeforeEach
-    public void createUserAndUserController() {
+    public void createUserAndInMemoryUserStorage() {
         user = new User();
         user.setLogin("RandomUser1000-7");
         user.setName("Борис");
         user.setEmail("RandomUser1000-7@gmail.com");
         user.setBirthday(LocalDate.of(2018, 2, 12));
 
-        userController = new UserController();
+        inMemoryUserStorage = new InMemoryUserStorage(new HashMap<>());
     }
 
     @Test
     public void shouldPassValidation() {
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertNull(validateException);
     }
@@ -35,12 +36,12 @@ public class UserControllerValidateTest {
     @Test
     public void loginShouldNotBeBlankOrNull() {
         user.setLogin(null);
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertEquals("Логин не может быть пустым", validateException.getMessage());
 
         user.setLogin("      ");
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertEquals("Логин не может быть пустым", validateException.getMessage());
     }
@@ -48,7 +49,7 @@ public class UserControllerValidateTest {
     @Test
     public void todayBirthdayShouldPass() {
         user.setBirthday(LocalDate.now());
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertNull(validateException);
     }
@@ -56,7 +57,7 @@ public class UserControllerValidateTest {
     @Test
     public void tomorrowBirthdayShouldNotPass() {
         user.setBirthday(LocalDate.now().plusDays(1));
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertEquals("День рождения не может быть позже текущей даты", validateException.getMessage());
     }
@@ -64,12 +65,12 @@ public class UserControllerValidateTest {
     @Test
     public void emailShouldNotBeBlankOrNull() {
         user.setEmail(null);
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertEquals("email не должен быть пустым", validateException.getMessage());
 
         user.setEmail("      ");
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertEquals("email не должен быть пустым", validateException.getMessage());
     }
@@ -77,7 +78,7 @@ public class UserControllerValidateTest {
     @Test
     public void emailShouldContainAtSign() {
         user.setEmail("RandomUser1000-7gmail.com");
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertEquals("email должен содержать символ \"@\"", validateException.getMessage());
     }
@@ -85,7 +86,7 @@ public class UserControllerValidateTest {
     @Test
     public void loginShouldNotContainSpace() {
         user.setLogin("Random User 1000-7");
-        validateException = userController.validateUser(user);
+        validateException = inMemoryUserStorage.validateUser(user);
 
         assertEquals("Логин не может содержать пробелы", validateException.getMessage());
     }
