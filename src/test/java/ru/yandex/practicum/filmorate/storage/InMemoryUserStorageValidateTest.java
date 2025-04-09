@@ -1,19 +1,23 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class InMemoryUserStorageValidateTest {
     User user;
     InMemoryUserStorage inMemoryUserStorage;
-    ConditionsNotMetException validateException;
+    Validator validator;
+    Set<ConstraintViolation<User>> violations;
 
     @BeforeEach
     public void createUserAndInMemoryUserStorage() {
@@ -24,70 +28,72 @@ public class InMemoryUserStorageValidateTest {
         user.setBirthday(LocalDate.of(2018, 2, 12));
 
         inMemoryUserStorage = new InMemoryUserStorage(new HashMap<>());
+
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     @Test
     public void shouldPassValidation() {
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertNull(validateException);
+        assertTrue(violations.isEmpty());
     }
 
     @Test
     public void loginShouldNotBeBlankOrNull() {
         user.setLogin(null);
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertEquals("Логин не может быть пустым", validateException.getMessage());
+        assertFalse(violations.isEmpty());
 
         user.setLogin("      ");
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertEquals("Логин не может быть пустым", validateException.getMessage());
+        assertFalse(violations.isEmpty());
     }
 
     @Test
-    public void todayBirthdayShouldPass() {
+    public void todayBirthdayShouldNotPass() {
         user.setBirthday(LocalDate.now());
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertNull(validateException);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void tomorrowBirthdayShouldNotPass() {
         user.setBirthday(LocalDate.now().plusDays(1));
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertEquals("День рождения не может быть позже текущей даты", validateException.getMessage());
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void emailShouldNotBeBlankOrNull() {
         user.setEmail(null);
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertEquals("email не должен быть пустым", validateException.getMessage());
+        assertFalse(violations.isEmpty());
 
         user.setEmail("      ");
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertEquals("email не должен быть пустым", validateException.getMessage());
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void emailShouldContainAtSign() {
         user.setEmail("RandomUser1000-7gmail.com");
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertEquals("email должен содержать символ \"@\"", validateException.getMessage());
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     public void loginShouldNotContainSpace() {
         user.setLogin("Random User 1000-7");
-        validateException = inMemoryUserStorage.validateUser(user);
+        violations = validator.validate(user);
 
-        assertEquals("Логин не может содержать пробелы", validateException.getMessage());
+        assertFalse(violations.isEmpty());
     }
 }

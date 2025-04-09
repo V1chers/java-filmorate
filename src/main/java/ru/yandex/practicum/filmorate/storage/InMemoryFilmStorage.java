@@ -39,11 +39,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Film createFilm(@RequestBody Film film) {
         log.info("Начинается добавление фильма");
-        ConditionsNotMetException validateException = validateFilm(film);
-        if (validateException != null) {
-            log.warn("Ошибка валидации при добавлении фильма", validateException);
-            throw validateException;
-        }
+        validateFilm(film);
         log.trace("Фильм прошел валидацию");
 
         Film newFilm = new Film(film, createFilmId());
@@ -79,14 +75,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film.getDuration() != null) {
             updatedFilm.setDuration(film.getDuration());
         }
-        oldFilm.getLikes().forEach(updatedFilm::addLike);
         log.debug("В копию были добавлены измененные данные: {}", updatedFilm);
 
-        ConditionsNotMetException validateException = validateFilm(updatedFilm);
-        if (validateException != null) {
-            log.warn("Ошибка валидации при обновлении содержимого фильма", validateException);
-            throw validateException;
-        }
+        validateFilm(updatedFilm);
         log.trace("Измененная копия фильма прошла валидацию");
 
         films.put(updatedFilm.getId(), updatedFilm);
@@ -99,19 +90,22 @@ public class InMemoryFilmStorage implements FilmStorage {
         return lastId;
     }
 
-    public ConditionsNotMetException validateFilm(Film film) {
+    public void validateFilm(Film film) {
         if (film.getName() == null || film.getName().isBlank()) {
-            return new ConditionsNotMetException("Название фильма не должно быть пустым");
+            log.warn("Ошибка валидации, название фильма не должно быть пустым");
+            throw new ConditionsNotMetException("Название фильма не должно быть пустым");
         }
         if (film.getDescription().length() > 200) {
-            return new ConditionsNotMetException("Описание не должно содержать больше 200 символов");
+            log.warn("Ошибка валидации, описание не должно содержать больше 200 символов");
+            throw new ConditionsNotMetException("Описание не должно содержать больше 200 символов");
         }
         if (film.getReleaseDate().isBefore(LocalDate.parse("1895-12-28"))) {
-            return new ConditionsNotMetException("Дата релиза не может быть раньше дня рождения кино");
+            log.warn("Ошибка валидации, дата релиза не может быть раньше дня рождения кино");
+            throw new ConditionsNotMetException("Дата релиза не может быть раньше дня рождения кино");
         }
         if (!film.getDuration().isPositive()) {
-            return new ConditionsNotMetException("Продолжительность фильма не может быть отрицательной или равна нулю");
+            log.warn("Ошибка валидации, продолжительность фильма не может быть отрицательной или равна нулю");
+            throw new ConditionsNotMetException("Продолжительность фильма не может быть отрицательной или равна нулю");
         }
-        return null;
     }
 }
