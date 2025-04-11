@@ -1,7 +1,7 @@
 # java-filmorate
 Template repository for Filmorate project.
 
-!(/filmorate_ER_Diagram.png)
+![filmorate_ER_Diagram](/filmorate_ER_Diagram.png)
 
 Получить все фильмы по моему проще через 3 запроса:
 - Сначала получаем сами объекты фильмов
