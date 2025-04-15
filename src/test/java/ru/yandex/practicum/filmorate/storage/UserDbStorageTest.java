@@ -25,18 +25,18 @@ class UserDbStorageTest {
     @Test
     public void shouldCreateAndFindUser() {
         User user = createUser();
-        userStorage.createUser(user);
-        User expectedUser = new User(user, 4);
+        User createdUser = userStorage.createUser(user);
+        User expectedUser = new User(user, createdUser.getId());
 
-        assertEquals(expectedUser, userStorage.findUser(4));
+        assertEquals(expectedUser, userStorage.findUser(createdUser.getId()));
     }
 
     @Test
     public void shouldCheckFriendship() {
         User user = createUser();
         user.addFriend(2);
-        userStorage.createUser(user);
-        user = userStorage.findUser(5);
+        int createdUserId = userStorage.createUser(user).getId();
+        user = userStorage.findUser(createdUserId);
 
         Optional<Friend> friend = user.getFriends().stream()
                 .filter(frnd -> frnd.getId() == 2)
@@ -45,16 +45,16 @@ class UserDbStorageTest {
         assertFalse(friend.get().getIsConfirmed());
 
         User user2 = userStorage.findUser(2);
-        user2.addFriend(5);
+        user2.addFriend(createdUserId);
         userStorage.updateUser(user2);
-        user = userStorage.findUser(5);
+        user = userStorage.findUser(createdUserId);
         user2 = userStorage.findUser(2);
 
         friend = user.getFriends().stream()
                 .filter(frnd -> frnd.getId() == 2)
                 .findFirst();
         Optional<Friend> friend2 = user2.getFriends().stream()
-                .filter(frnd -> frnd.getId() == 5)
+                .filter(frnd -> frnd.getId() == createdUserId)
                 .findFirst();
 
         assertTrue(friend.get().getIsConfirmed());

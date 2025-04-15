@@ -28,12 +28,12 @@ public class FilmDbStorageTest {
     public void shouldCreateAndGetFilm() {
         Film film = createFilm();
 
-        filmDbStorage.createFilm(film);
+        int createdFilmId = filmDbStorage.createFilm(film).getId();
 
-        Film expectedFilm = new Film(film, 4);
+        Film expectedFilm = new Film(film, createdFilmId);
         expectedFilm.getMpa().setName("G");
 
-        assertEquals(expectedFilm, filmDbStorage.findFilm(4));
+        assertEquals(expectedFilm, filmDbStorage.findFilm(createdFilmId));
     }
 
     @Test
