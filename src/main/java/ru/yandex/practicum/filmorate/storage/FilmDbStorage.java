@@ -38,7 +38,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public Collection<Film> findAll() {
-        String findFilm = "SELECT id, " +
+        String findFilms = "SELECT id, " +
                 "name, " +
                 "description, " +
                 "release_date, " +
@@ -46,7 +46,7 @@ public class FilmDbStorage implements FilmStorage {
                 "age_rating " +
                 "FROM films ";
 
-        Collection<Film> films = jdbc.query(findFilm, filmMapper);
+        Collection<Film> films = jdbc.query(findFilms, filmMapper);
 
         films.forEach(film -> {
             Set<Genre> filmGenres = getGenres(film.getId());
@@ -92,7 +92,7 @@ public class FilmDbStorage implements FilmStorage {
         validateFilm(film);
         checkFilmsFields(film);
 
-        Date releaseDay = film.getReleaseDate() == null ? null : Date.valueOf(film.getReleaseDate());
+        Date releaseDate = film.getReleaseDate() == null ? null : Date.valueOf(film.getReleaseDate());
         Integer mpaId = film.getMpa() == null ? null : film.getMpa().getId();
 
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -104,7 +104,7 @@ public class FilmDbStorage implements FilmStorage {
                     .prepareStatement(insertFilm, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, film.getName());
             ps.setString(2, film.getDescription());
-            ps.setDate(3, releaseDay);
+            ps.setDate(3, releaseDate);
             ps.setString(4, DurationMapper.getInterval(film.getDuration()));
             if (mpaId == null) {
                 ps.setNull(5, Types.INTEGER);
@@ -221,11 +221,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void deleteGenres(Set<Integer> genres, int filmId) {
-        String deleteFriend = "DELETE FROM films_category " +
+        String deleteFilmGenres = "DELETE FROM films_category " +
                 "WHERE film_id = ? " +
                 "AND category_id = ? ";
 
-        genres.forEach(genreId -> jdbc.update(deleteFriend, filmId, genreId));
+        genres.forEach(genreId -> jdbc.update(deleteFilmGenres, filmId, genreId));
     }
 
     private void addLikes(Set<Integer> usersId, int filmId) {
@@ -244,7 +244,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private String findAgeRating(Film film) {
-        String queryGenres = "SELECT rating " +
+        String queryRating = "SELECT rating " +
                 "FROM age_rating " +
                 "WHERE id = ? ";
 
@@ -254,7 +254,7 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         try {
-            return jdbc.queryForObject(queryGenres, String.class, mpaId);
+            return jdbc.queryForObject(queryRating, String.class, mpaId);
         } catch (EmptyResultDataAccessException ignored) {
             throw new NotFoundException("Возрастного рейтинга с таким id не было найдено");
         }

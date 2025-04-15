@@ -27,12 +27,12 @@ public class MiscDbStorage implements MiscStorage {
     }
 
     public Genre findGenre(int genreId) {
-        String findGenres = "SELECT * " +
+        String findGenre = "SELECT * " +
                 "FROM category " +
                 "WHERE id = ?";
 
         try {
-            return jdbc.queryForObject(findGenres, genreMapper, genreId);
+            return jdbc.queryForObject(findGenre, genreMapper, genreId);
         } catch (EmptyResultDataAccessException ignored) {
             throw new NotFoundException("Жанр с таким id не был найден");
         }
