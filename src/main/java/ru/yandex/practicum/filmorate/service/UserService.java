@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
+import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -43,6 +44,8 @@ public class UserService {
         }
         log.debug("Пользователь был добавлен другу в друзья: {}", friend);
 
+        userStorage.updateUser(user);
+
         log.info("Процесс добавления друга прошел успешно");
         return user;
     }
@@ -58,6 +61,8 @@ public class UserService {
         friend.deleteFriend(userId);
         log.debug("Пользователь был удален у друга из друзей: {}", friend);
 
+        userStorage.updateUser(user);
+
         log.info("Процесс удаления друга прошел успешно");
         return user;
     }
@@ -66,7 +71,7 @@ public class UserService {
         log.info("Проходит процесс поиска друзей у пользователя");
         User user = userStorage.findUser(userId);
 
-        return user.getFriends().stream().map(userStorage::findUser).collect(Collectors.toSet());
+        return user.getFriends().stream().map(friend -> userStorage.findUser(friend.getId())).collect(Collectors.toSet());
     }
 
     public Collection<User> findCommonFriends(int userId, int friendId) {
@@ -74,12 +79,13 @@ public class UserService {
         User user = userStorage.findUser(userId);
         User friend = userStorage.findUser(friendId);
         log.trace("По заданным id были найдены пользователи");
-        Set<Integer> userFriendList = new HashSet<>(user.getFriends());
+        Set<Integer> userFriendList = user.getFriends().stream().map(Friend::getId).collect(Collectors.toSet());
+        Set<Integer> friendsFriendList = friend.getFriends().stream().map(Friend::getId).collect(Collectors.toSet());
         log.trace("Был получен список друзей пользователя");
         Set<Integer> commonFriendList = new HashSet<>();
         log.trace("Был создан пустой список общих друзей");
 
-        for (int id : friend.getFriends()) {
+        for (int id : friendsFriendList) {
             if (!userFriendList.add(id)) {
                 commonFriendList.add(id);
             }
