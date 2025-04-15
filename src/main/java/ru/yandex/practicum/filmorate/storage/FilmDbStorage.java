@@ -150,10 +150,10 @@ public class FilmDbStorage implements FilmStorage {
         Set<Integer> newGenres = film.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
         Set<Integer> oldGenres = getGenres(film.getId()).stream().map(Genre::getId).collect(Collectors.toSet());
 
-        HashMap<String, Set<Integer>> ChangeDataList = makeChangeDataList(newGenres, oldGenres);
+        HashMap<String, Set<Integer>> changeDataList = makeChangeDataList(newGenres, oldGenres);
 
-        addGenres(ChangeDataList.get("toAdd"), film.getId());
-        deleteGenres(ChangeDataList.get("toDelete"), film.getId());
+        addGenres(changeDataList.get("toAdd"), film.getId());
+        deleteGenres(changeDataList.get("toDelete"), film.getId());
     }
 
     private void updateLikes(Film film) {
