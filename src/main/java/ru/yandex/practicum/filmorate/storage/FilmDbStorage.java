@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ConditionsNotMetException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.mapper.DurationMapper;
 import ru.yandex.practicum.filmorate.mapper.FilmRowMapper;
 import ru.yandex.practicum.filmorate.mapper.GenreRowMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -104,7 +105,7 @@ public class FilmDbStorage implements FilmStorage {
             ps.setString(1, film.getName());
             ps.setString(2, film.getDescription());
             ps.setDate(3, releaseDay);
-            ps.setInt(4, (int) film.getDuration().toMinutes());
+            ps.setString(4, DurationMapper.getInterval(film.getDuration()));
             if (mpaId == null) {
                 ps.setNull(5, Types.INTEGER);
             } else {
@@ -133,7 +134,7 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE id = ?";
 
         int rowsUpdated = jdbc.update(updateFilm, film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration().toMinutes(), film.getMpa().getId(), film.getId());
+                DurationMapper.getInterval(film.getDuration()), film.getMpa().getId(), film.getId());
 
         if (rowsUpdated == 0) {
             throw new NotFoundException("Такого фильма не существует");
