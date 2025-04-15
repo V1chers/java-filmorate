@@ -18,6 +18,7 @@ import java.sql.Statement;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -82,7 +83,7 @@ public class FilmDbStorage implements FilmStorage {
 
             return film;
         } catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundException("Пользователь с таким id не был найден");
+            throw new NotFoundException("Фильм с таким id не был найден");
         }
     }
 
@@ -148,44 +149,42 @@ public class FilmDbStorage implements FilmStorage {
         Set<Integer> newGenres = film.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
         Set<Integer> oldGenres = getGenres(film.getId()).stream().map(Genre::getId).collect(Collectors.toSet());
 
-        Set<Integer> listToDelete = new HashSet<>();
-        Set<Integer> listToAdd = new HashSet<>();
+        HashMap<String, Set<Integer>> ChangeDataList = makeChangeDataList(newGenres, oldGenres);
 
-        newGenres.forEach(genre -> {
-            if (!oldGenres.contains(genre)) {
-                listToAdd.add(genre);
-            }
-        });
-        oldGenres.forEach(genre -> {
-            if (!newGenres.contains(genre)) {
-                listToDelete.add(genre);
-            }
-        });
-
-        addGenres(listToAdd, film.getId());
-        deleteGenres(listToDelete, film.getId());
+        addGenres(ChangeDataList.get("toAdd"), film.getId());
+        deleteGenres(ChangeDataList.get("toDelete"), film.getId());
     }
 
     private void updateLikes(Film film) {
         Set<Integer> newLikes = film.getLikes();
         Set<Integer> oldLikes = getLikes(film.getId());
 
+        HashMap<String, Set<Integer>> changeDataList = makeChangeDataList(newLikes, oldLikes);
+
+        addLikes(changeDataList.get("toAdd"), film.getId());
+        deleteLikes(changeDataList.get("toDelete"), film.getId());
+    }
+
+    private HashMap<String, Set<Integer>> makeChangeDataList(Set<Integer> newData, Set<Integer> oldDate) {
         Set<Integer> listToDelete = new HashSet<>();
         Set<Integer> listToAdd = new HashSet<>();
 
-        newLikes.forEach(userId -> {
-            if (!oldLikes.contains(userId)) {
+        newData.forEach(userId -> {
+            if (!oldDate.contains(userId)) {
                 listToAdd.add(userId);
             }
         });
-        oldLikes.forEach(userId -> {
-            if (!newLikes.contains(userId)) {
+        oldDate.forEach(userId -> {
+            if (!newData.contains(userId)) {
                 listToDelete.add(userId);
             }
         });
 
-        addLikes(listToAdd, film.getId());
-        deleteLikes(listToDelete, film.getId());
+        HashMap<String, Set<Integer>> changeDataList = new HashMap<>();
+        changeDataList.put("toAdd", listToAdd);
+        changeDataList.put("toDelete", listToDelete);
+
+        return changeDataList;
     }
 
     private Set<Integer> getLikes(int filmId) {
@@ -256,8 +255,6 @@ public class FilmDbStorage implements FilmStorage {
         try {
             return jdbc.queryForObject(queryGenres, String.class, mpaId);
         } catch (EmptyResultDataAccessException ignored) {
-            System.out.println(film);
-            System.out.println(mpaId);
             throw new NotFoundException("Возрастного рейтинга с таким id не было найдено");
         }
     }

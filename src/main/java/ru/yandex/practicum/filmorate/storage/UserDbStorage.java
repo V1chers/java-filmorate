@@ -82,7 +82,12 @@ public class UserDbStorage implements UserStorage {
     public User updateUser(User user) {
         checkFriendList(user);
 
-        String updateUser = "UPDATE users SET login = ?, email = ?, name = ?, birthday = ? WHERE id = ?";
+        String updateUser = "UPDATE users " +
+                "SET login = ?, " +
+                "email = ?, " +
+                "name = ?, " +
+                "birthday = ? " +
+                "WHERE id = ?";
 
         int rowsUpdated = jdbc.update(updateUser, user.getLogin(), user.getEmail(), user.getName(),
                 user.getBirthday(), user.getId());

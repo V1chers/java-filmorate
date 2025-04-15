@@ -53,7 +53,7 @@ public class MiscDbStorage implements MiscStorage {
         try {
             return jdbc.queryForObject(findMpa, mpaMapper, mpaId);
         } catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundException("Жанр с таким id не был найден");
+            throw new NotFoundException("Возрастной рейтинг с таким id не был найден");
         }
     }
 }
