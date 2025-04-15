@@ -23,7 +23,7 @@ class UserDbStorageTest {
     private final UserDbStorage userStorage;
 
     @Test
-    public void ShouldCreateAndFindUser() {
+    public void shouldCreateAndFindUser() {
         User user = createUser();
         userStorage.createUser(user);
         User expectedUser = new User(user, 4);
@@ -32,7 +32,7 @@ class UserDbStorageTest {
     }
 
     @Test
-    public void ShouldCheckFriendship() {
+    public void shouldCheckFriendship() {
         User user = createUser();
         user.addFriend(2);
         userStorage.createUser(user);
@@ -77,7 +77,7 @@ class UserDbStorageTest {
     }
 
     @Test
-    public void ShouldDeleteFriendInBothUsers() {
+    public void shouldDeleteFriendInBothUsers() {
         User user = userStorage.findUser(1);
         User user2 = userStorage.findUser(2);
 

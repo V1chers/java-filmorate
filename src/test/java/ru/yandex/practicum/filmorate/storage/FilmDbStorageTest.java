@@ -25,7 +25,7 @@ public class FilmDbStorageTest {
     private final FilmDbStorage filmDbStorage;
 
     @Test
-    public void ShouldCreateAndGetFilm() {
+    public void shouldCreateAndGetFilm() {
         Film film = createFilm();
 
         filmDbStorage.createFilm(film);
