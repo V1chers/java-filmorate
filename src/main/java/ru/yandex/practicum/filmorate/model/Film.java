@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.yandex.practicum.filmorate.serializeranddeserializer.DurationSerializer;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -14,6 +16,7 @@ import java.util.Set;
  * Film.
  */
 @Data
+@RequiredArgsConstructor
 public class Film {
     private final int id;
     private String name;
@@ -22,10 +25,13 @@ public class Film {
     @JsonSerialize(using = DurationSerializer.class)
     private Duration duration;
     private final Set<Integer> likes;
+    private Mpa mpa;
+    private final Set<Genre> genres;
 
     public Film() {
         id = -1;
         likes = new HashSet<>();
+        genres = new HashSet<>();
     }
 
     public Film(Film film, int id) {
@@ -35,6 +41,8 @@ public class Film {
         this.releaseDate = film.getReleaseDate();
         this.duration = film.getDuration();
         this.likes = new HashSet<>(film.getLikes());
+        this.genres = new HashSet<>(film.getGenres());
+        this.mpa = film.getMpa();
     }
 
     @Autowired
@@ -50,7 +58,19 @@ public class Film {
         return likes.add(userId);
     }
 
+    public boolean addLikes(Collection<Integer> usersId) {
+        return likes.addAll(usersId);
+    }
+
     public boolean deleteLike(int userId) {
         return likes.remove(userId);
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
+
+    public void addGenres(Collection<Genre> genresList) {
+        genres.addAll(genresList);
     }
 }

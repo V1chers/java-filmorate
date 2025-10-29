@@ -36,6 +36,8 @@ public class FilmService {
         }
         log.info("Фильму успешно был поставлен лайк: {}", film);
 
+        filmStorage.updateFilm(film);
+
         return film;
     }
 
